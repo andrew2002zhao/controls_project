@@ -1,12 +1,15 @@
 import os
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from ament_index_python.packages import get_package_prefix
 from launch_ros.descriptions import ParameterValue
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -71,8 +74,43 @@ def generate_launch_description():
                    '-topic', robot_name_1+'/robot_description']
     )
 
+    controller_manager = "/%s/controller_manager" % (robot_name_1)
+
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=robot_name_1,
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=["joint_state_broadcaster",
+                   "--controller-manager", controller_manager],
+    )
+
+    robot_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=robot_name_1,
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=["diff_drive_controller",  "-c", controller_manager],
+    )
+
+   
     return LaunchDescription([
+      
         gazebo,
         rsp_robot1,
         spawn_robot1,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawn_robot1,
+                on_exit=[joint_state_broadcaster_spawner],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster_spawner,
+                on_exit=[robot_controller_spawner],
+            )
+        ),
     ])
