@@ -1,9 +1,8 @@
 # The rb1_ros2_description package
 
-This package contains a ROS2 robot model description for Robotnik's RB-1 mobile base.   
+This package provides the controllers for the elevator and the differential drive for a RB1 bot. 
 
-## Disclaimer:  
-This package only modifies/adapts files from these repositories/packages:  
-- [RobotnikAutomation/rb1_base_sim](https://github.com/RobotnikAutomation/rb1_base_sim) licensed under the BSD 2-Clause "Simplified" License
-- [RobotnikAutomation/rb1_base_common/rb1_base_description](https://github.com/RobotnikAutomation/rb1_base_common/tree/melodic-devel/rb1_base_description), licensed under the BSD License
-- [RobotnikAutomation/robotnik_sensors],(https://github.com/RobotnikAutomation/robotnik_sensors) licensed under the BSD License
+To use this package 
+1) clone it from into 
+2) build it with cd ~/ros2_ws/src/ colcon build
+3) source the package with source install/setup
